@@ -1,4 +1,5 @@
 :- dynamic( arc/2 ).
+:- dynamic( verticeOnEdge/2 ).
 
 %generateVerticesList(+floorsNumber,-returnList)
 %generate the list of vertices depending on floorNumber
@@ -30,6 +31,11 @@ test(A,X) :- generateMemoFloor(5,L), getFloor(A,L,X).
 
 generateGraphRec([],_).
 generateGraphRec([Hl|Ql],M) :- getFloor(Hl,M,Floor),Next is Floor+Hl,assert(arc(Hl,Next)),assert(arc(Next,Hl)),
-	Next2 is Next+1,assert(arc(Hl,Next2)),assert(arc(Next2,Hl)) ,generateGraphRec(Ql,M).
+	Next2 is Next+1,assert(arc(Hl,Next2)),assert(arc(Next2,Hl)) ,linkVerticeToEdge(Next, Floor), linkVerticeToEdge(Next2, Floor),generateGraphRec(Ql,M).
 
 generateGraph(N) :- NReel is N-1, generateMemoFloor(NReel,M), generateVerticesList(NReel, V), generateGraphRec(V,M).
+
+%edgethree
+linkVerticeToEdge(V, F) :- V is (F*(3+F)/2), assert(verticeOnEdge(V,3)).
+linkVerticeToEdge(V, F) :- V is (F*(1+F)/2), assert(verticeOnEdge(V,1)).
+linkVerticeToEdge(_, _).
