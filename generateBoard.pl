@@ -35,13 +35,14 @@ generateGraphRec([Hl|Ql],M,N) :- getFloor(Hl,M,Floor),Next is Floor+Hl,assert(ar
 
 generateGraph(N) :- NReel is N-1, generateMemoFloor(NReel,M), generateVerticesList(NReel, V), generateGraphRec(V,M,NReel).
 
-verticeOnEdge(0,1).
-verticeOnEdge(0,3).
-
-%edgethree
-
-linkVerticeToEdge(V, F, N) :- F == N, V is (F*(3+F)/2), assert(verticeOnEdge(V,3), assert(verticeOnEdge(V,2)).
-linkVerticeToEdge(V, F, N) :- F == N, V is (F*(1+F)/2), assert(verticeOnEdge(V,1), assert(verticeOnEdge(V,2)).
+%linkVerticeToEdge(+vertice,+verticeFloor,-floorsNumber)
+linkVerticeToEdge(V, F, N) :- F == N, V is (F*(3+F)/2), assert(verticeOnEdge(V,3)), assert(verticeOnEdge(V,2)).
+linkVerticeToEdge(V, F, N) :- F == N, V is (F*(1+F)/2), assert(verticeOnEdge(V,1)), assert(verticeOnEdge(V,2)).
+linkVerticeToEdge(V, F, N) :- F == N, not(verticeOnEdge(V,2)), assert(verticeOnEdge(V,2)).
 linkVerticeToEdge(V, F,_) :- V is (F*(3+F)/2), assert(verticeOnEdge(V,3)).
 linkVerticeToEdge(V, F,_) :- V is (F*(1+F)/2), assert(verticeOnEdge(V,1)).
 linkVerticeToEdge(_, _,_).
+
+%these two facts concerning the root of the board have to be hardcoded
+verticeOnEdge(0,1).
+verticeOnEdge(0,3).
