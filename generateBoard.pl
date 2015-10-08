@@ -27,15 +27,21 @@ getFloor(A,L,C) :- length(L,B), getFloorRec(A,L,X,B), C is X + 1.
 test(A,X) :- generateMemoFloor(5,L), getFloor(A,L,X).
 
 %generateGraph(+floorsNumber)
-%generateGraphRec(+verticesList, +memoFloorsList)
+%generateGraphRec(+verticesList, +memoFloorsList, floorsNumber)
 
-generateGraphRec([],_).
-generateGraphRec([Hl|Ql],M) :- getFloor(Hl,M,Floor),Next is Floor+Hl,assert(arc(Hl,Next)),assert(arc(Next,Hl)),
-	Next2 is Next+1,assert(arc(Hl,Next2)),assert(arc(Next2,Hl)) ,linkVerticeToEdge(Next, Floor), linkVerticeToEdge(Next2, Floor),generateGraphRec(Ql,M).
+generateGraphRec([],_,_).
+generateGraphRec([Hl|Ql],M,N) :- getFloor(Hl,M,Floor),Next is Floor+Hl,assert(arc(Hl,Next)),assert(arc(Next,Hl)),
+	Next2 is Next+1,assert(arc(Hl,Next2)),assert(arc(Next2,Hl)) ,linkVerticeToEdge(Next, Floor,N), linkVerticeToEdge(Next2, Floor,N),generateGraphRec(Ql,M,N).
 
-generateGraph(N) :- NReel is N-1, generateMemoFloor(NReel,M), generateVerticesList(NReel, V), generateGraphRec(V,M).
+generateGraph(N) :- NReel is N-1, generateMemoFloor(NReel,M), generateVerticesList(NReel, V), generateGraphRec(V,M,NReel).
+
+verticeOnEdge(0,1).
+verticeOnEdge(0,3).
 
 %edgethree
-linkVerticeToEdge(V, F) :- V is (F*(3+F)/2), assert(verticeOnEdge(V,3)).
-linkVerticeToEdge(V, F) :- V is (F*(1+F)/2), assert(verticeOnEdge(V,1)).
-linkVerticeToEdge(_, _).
+
+linkVerticeToEdge(V, F, N) :- F == N, V is (F*(3+F)/2), assert(verticeOnEdge(V,3), assert(verticeOnEdge(V,2)).
+linkVerticeToEdge(V, F, N) :- F == N, V is (F*(1+F)/2), assert(verticeOnEdge(V,1), assert(verticeOnEdge(V,2)).
+linkVerticeToEdge(V, F,_) :- V is (F*(3+F)/2), assert(verticeOnEdge(V,3)).
+linkVerticeToEdge(V, F,_) :- V is (F*(1+F)/2), assert(verticeOnEdge(V,1)).
+linkVerticeToEdge(_, _,_).
