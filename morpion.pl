@@ -84,7 +84,7 @@ minN([[X1|L]|Xs],[X1|L]):- minN(Xs,[Y|_]), X1 =< Y.
 minN([[X1|_]|Xs],[N|QN]):- minN(Xs,[N|QN]), N < X1.
 
 /** minimax(+joueur,+pos_courante,-valeur,-pos_suivante,+profondeur)
-La grosse fonction un peu pete couille.
+La grosse fonction un peu "pénible".
 En gros, on lui donne un joueur, la position actuelle, ainsi que la profondeur, et elle ressort le meilleur coup, ainsi que sa note.
 */
 
