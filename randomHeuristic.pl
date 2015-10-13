@@ -5,8 +5,8 @@ Indicate if the game is finished.
 Player value is max if max win, min if min win.
 */
 
-final(V,max) :- win(V,w),!.
-final(V,min) :- win(V,b),!.
+%final(V,max) :- win(V,w),!.
+%final(V,min) :- win(V,b),!.
 
 
 /** hRandom(+vertices,-grade)
