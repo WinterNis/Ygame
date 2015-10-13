@@ -2,9 +2,9 @@
 %e: Empty
 %w: White
 %b: Black
-vertices(L) :- L=[e,e,e,e,e,e].
 
 %arc(+Start, +End)
+/**
 arc(0,1).
 arc(1,0).
 arc(0,2).
@@ -23,9 +23,11 @@ arc(3,4).
 arc(4,3).
 arc(4,5).
 arc(5,4).
+*/
 
 %Test whether a vertice is on an edge of the board.
 %verticeOnEdge(+Vertice, -EdgeNumber)
+/**
 verticeOnEdge(0,1).
 verticeOnEdge(1,1).
 verticeOnEdge(3,1).
@@ -35,6 +37,7 @@ verticeOnEdge(5,2).
 verticeOnEdge(5,3).
 verticeOnEdge(2,3).
 verticeOnEdge(0,3).
+*/
 
 %win(+Vertices, +PlayerColor)
 win(V,C) :- playerVertices(V,C,P),separateIntoIslets(P,I),hasAWinningIslet(I).
