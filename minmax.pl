@@ -24,7 +24,7 @@ minN([[X1|_]|Xs],[N|QN]):- minN(Xs,[N|QN]), N < X1.
 From a current configuration and a player, calculate the best next configuration and the corresponding evaluation
 */
 
-minimax(_,V,Eval,V,_) :- final(V,_),h(V,Eval),!.
+minimax(_,V,Eval,V,_) :- final(V,_),hRandom(V,Eval),!.
 minimax(_,V,Eval,V,Depth) :- hRandom(V,Eval), Depth == 0,!.
 
 minimax(w,V,Eval,VNext,Depth) :- DepthNext is Depth-1,
@@ -39,7 +39,7 @@ combiMoveMinimax(V,X,Y,TestNext,TestEval,DepthNext) :- move(V,X,TestNext),minima
 
 
 %testJeu(N,LNext) :- generateGraph(N), generateVerticesEmptyList(N,L), minimax(w,L,X,LNext,2).
-testJeu(N,LNext) :- minimax(w,[b,b,w,e,w,e],X,LNext,2).
+testJeu(_,LNext) :- minimax(w,[b,b,w,e,w,e],_,LNext,2).
 
 /**
 play(+Cnfiguration,+Player,-ConfigurationNext)
