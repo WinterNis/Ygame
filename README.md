@@ -1,4 +1,6 @@
 # Ygame
-Ygame AI using swi-prolog
+Ygame AI swi-prolog
 
+=======
 INSA project
+
