@@ -2,19 +2,89 @@
  * Created by kilian on 10/6/15.
  */
 
+var serverRoot = '127.0.0.1:8000/';
+var colors = ['e', 'w', 'b'];
+
+var xmlhttp = new XMLHttpRequest();
+
+var ajaxRequest = function(url, func){
+    var response = "{}";
+    console.log(url);
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            response = xmlhttp.responseText;
+            console.log(response);
+
+            func(response);
+        }
+    }
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+};
+
 // mode = "ia" or "human"
 // id > 0
-var Player = function (mode, id, color) {
+var Player = function (mode, id, color, game) {
 
     // attributes
     var self = this;
     this.mode = mode;
     this.color = color;
     this.id = id;
+    this.game = game;
 
     //methods
     this.select = function (hexa) {
         return hexa.select(self);
+    };
+
+    this.playIfIA = function(){
+        if(!self.game.isBoardFull()) {
+            if (self.mode == 'ia') {
+
+                //====================
+                var prevBoardSerialized = self.game.getSerializedBoard();
+                /*var newBoardSerialized = prevBoardSerialized;
+                var newBoardSerialized = '';
+                var hexaSelected = self.game.getFirstEmptyHexa();
+                for(var i = 0; i < prevBoardSerialized.length; i++){
+                    if(i != (hexaSelected.id-1))
+                        newBoardSerialized += prevBoardSerialized[i];
+                    else
+                        newBoardSerialized += colors[self.id];
+                }*/
+                //=====================
+                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id], function(resp){
+                    var newBoardSerialized = JSON.parse(resp).prolog;
+
+                    //var hexaPlayed = self.game.getFirstEmptyHexa();
+                    hexaSelected = null;
+                    for(var i = 0; i < prevBoardSerialized.length; i++) {
+                        if(prevBoardSerialized[i] != newBoardSerialized[i]){
+                            hexaSelected = i;
+                        }
+                    }
+
+                    //self.select(self.game.getFirstEmptyHexa());
+                    self.select(self.game.listHexas[hexaSelected]);
+                    self.game.changePlayer();
+                });
+            }
+        } else {
+            alert('Le plateau de jeu est rempli.');
+        }
+    };
+
+    this.playIfHuman = function(hexa){
+        if(!self.game.isBoardFull()) {
+            if (self.mode == 'human') {
+                // si la selection a fonctionne
+                if (self.select(hexa))
+                    self.game.changePlayer();
+            }
+        } else {
+            alert('Le plateau de jeu est rempli.');
+        }
     };
 };
 
@@ -30,8 +100,7 @@ var Hexagon = function (shape, id, game) {
 
     // on construit le handler de clic
     shape.onClick = function(){
-        if(self.game.currentPlayer.select(self))
-            self.game.changePlayer();
+        self.game.currentPlayer.playIfHuman(self);
     };
 
     this.select = function(player){
@@ -46,14 +115,14 @@ var Hexagon = function (shape, id, game) {
 };
 
 // player[1-2]Mode = "ia" or "human"
-var YGame = function(nbFloors, canvasWidth, canvasHeight, player1Mode, player2Mode) {
+var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
 
     //attributes
     var self = this;
-    this.nbFloors = parseInt(prompt("Renseigner le nombre d'étages du plateau de jeu", "8"));
+    this.nbFloors = parseInt(prompt('Renseigner le nombre d\'étages du plateau de jeu', '8'));
     this.canvasHeight = canvasHeight;
-    this.player1 = new Player(player1Mode, 1, "blue");
-    this.player2 = new Player(player2Mode, 2, "red");
+    this.player1 = new Player(player1Mode, 1, "blue", self);
+    this.player2 = new Player(player2Mode, 2, "red", self);
     this.currentPlayer = this.player1;
     this.listHexas = [];
 
@@ -67,6 +136,8 @@ var YGame = function(nbFloors, canvasWidth, canvasHeight, player1Mode, player2Mo
         var hexRadius = hexHeight / 2;
         // nombre total d'hexagone sur le plan de jeu
         var nbHex = (self.nbFloors + 1) / 2 * self.nbFloors;
+
+        ajaxRequest('init?nbFloors=' + self.nbFloors, function(resp){});
 
         // algo pour ajouter et placer les hexagones
         var currFloor = 1;
@@ -95,6 +166,8 @@ var YGame = function(nbFloors, canvasWidth, canvasHeight, player1Mode, player2Mo
                 currHorizPos++;
             }
         }
+
+        self.currentPlayer.playIfIA();
     };
 
     this.changePlayer = function(){
@@ -102,8 +175,37 @@ var YGame = function(nbFloors, canvasWidth, canvasHeight, player1Mode, player2Mo
             self.currentPlayer = self.player2;
         else
             self.currentPlayer = self.player1;
+
+        console.log(self.getSerializedBoard());
+
+        self.currentPlayer.playIfIA();
     };
+
+    this.getFirstEmptyHexa = function(){
+        for(var i = 0; i < self.listHexas.length; i++){
+            if(self.listHexas[i].state == 0)
+                return self.listHexas[i];
+        }
+    };
+
+    this.isBoardFull = function(){
+        for(var i = 0; i < self.listHexas.length; i++){
+            if(self.listHexas[i].state == 0)
+                return false;
+        }
+        return true;
+    };
+
+    this.getSerializedBoard = function(){
+        var serializedBoard = '';
+
+        for(var i = 0; i < self.listHexas.length; i++){
+            serializedBoard += colors[self.listHexas[i].state];
+        }
+        return serializedBoard;
+    }
 };
 
-var yGame = new YGame(8, 800, 600, "human", "human");
+var yGame = new YGame(800, 600, 'human', 'ia');
 yGame.launch();
+
