@@ -65,8 +65,10 @@ var Player = function (mode, id, color, game) {
                         }
                     }
 
-                    if(hexaSelected == null)
+                    if(hexaSelected == null){
                         self.select(self.game.getFirstEmptyHexa());
+			console.log("serveur renvoi mal")	    
+		    }
                     else
                         self.select(self.game.listHexas[hexaSelected]);
                     self.game.changePlayer();

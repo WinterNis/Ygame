@@ -38,11 +38,11 @@ minimax(b,V,Eval,VNext,Depth) :- DepthNext is Depth-1,
 combiMoveMinimax(V,X,Y,TestNext,TestEval,DepthNext) :- move(V,X,TestNext),minimax(Y,TestNext,TestEval,_,DepthNext).
 
 
-%testJeu(N,LNext) :- generateGraph(N), generateVerticesEmptyList(N,L), minimax(w,L,X,LNext,2).
-testJeu(_,LNext) :- minimax(w,[b,b,w,e,w,e],_,LNext,2).
+%testJeu(N,LNext) :- generateGraph(N), generateVerticesEmptyList(N,L), minimax(w,L,_,LNext,2).
+testJeu(_,LNext) :- minimax(w,[b,b,e,e,w,e],_,LNext,1).
 
 /**
 play(+Cnfiguration,+Player,-ConfigurationNext)
 */
 
-play(C,P,CNext) :- minimax(P,C,_,CNext,3).
+play(C,P,CNext) :- minimax(P,C,_,CNext,1).
