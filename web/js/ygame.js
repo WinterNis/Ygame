@@ -13,7 +13,7 @@ var ajaxRequest = function(url, func){
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             response = xmlhttp.responseText;
-            console.log(response);
+            console.log('prolog : ' + response);
 
             func(response);
         }
@@ -55,9 +55,9 @@ var Player = function (mode, id, color, game) {
                 }*/
                 //=====================
                 var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id], function(resp){
-                    var newBoardSerialized = JSON.parse(resp).prolog;
+                    
+                    var newBoardSerialized = JSON.parse(resp).prolog.split(',').join('');
 
-                    //var hexaPlayed = self.game.getFirstEmptyHexa();
                     hexaSelected = null;
                     for(var i = 0; i < prevBoardSerialized.length; i++) {
                         if(prevBoardSerialized[i] != newBoardSerialized[i]){
@@ -65,8 +65,10 @@ var Player = function (mode, id, color, game) {
                         }
                     }
 
-                    //self.select(self.game.getFirstEmptyHexa());
-                    self.select(self.game.listHexas[hexaSelected]);
+                    if(hexaSelected == null)
+                        self.select(self.game.getFirstEmptyHexa());
+                    else
+                        self.select(self.game.listHexas[hexaSelected]);
                     self.game.changePlayer();
                 });
             }
@@ -175,8 +177,6 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
             self.currentPlayer = self.player2;
         else
             self.currentPlayer = self.player1;
-
-        console.log(self.getSerializedBoard());
 
         self.currentPlayer.playIfIA();
     };
