@@ -62,7 +62,7 @@ var Player = function (mode, id, color, game) {
         return hexa.select(self);
     };
 
-    this.playIfIA = function(){
+    this.playIfIA = function(nbFloors){
         if(!self.game.isBoardFull()) {
             if (self.mode == 'ia') {
 
@@ -78,7 +78,7 @@ var Player = function (mode, id, color, game) {
                         newBoardSerialized += colors[self.id];
                 }*/
                 //=====================
-                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id], function(resp){
+                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id] + '&nbFloors=' + nbFloors , function(resp){
                     
                     var newBoardSerialized = JSON.parse(resp).prolog.split(',').join('');
 
@@ -198,7 +198,7 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
         }
 
 		// dans le cas ou le premier joueur est un IA, il faut le faire jouer
-        self.currentPlayer.playIfIA();
+        self.currentPlayer.playIfIA(self.nbFloors);
     };
 
     this.changePlayer = function(){
@@ -207,7 +207,7 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
         else
             self.currentPlayer = self.player1;
 
-        self.currentPlayer.playIfIA();
+        self.currentPlayer.playIfIA(self.nbFloors);
     };
 
     this.getFirstEmptyHexa = function(){

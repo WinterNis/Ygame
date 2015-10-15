@@ -76,7 +76,8 @@ ygame(Request) :-
 ia(Request) :- 
 	cors_enable,
 	getTurnInfo(Request, Board, NextPlayer),
-	play(Board,NextPlayer,NextBoard),	
+	getNbFloors(Request, NbFloors),
+	play(Board,NextPlayer,NextBoard, NbFloors),	
 	atomic_list_concat(NextBoard, ',', NextBoardSerialized),
 	prolog_to_json(response(NextBoardSerialized), ResponseSerialized),
 	reply_json(ResponseSerialized).
