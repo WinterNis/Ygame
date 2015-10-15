@@ -2,11 +2,16 @@
  * Created by kilian on 10/6/15.
  */
 
-var serverRoot = '127.0.0.1:8000/';
+/*
+	utile pour le prolog
+	- couleur d'une case vide : e
+	- couleur d'une case occupee par joueur 1 : w
+	- couleur d'une case occupee par joueur 2 : b
+*/	
 var colors = ['e', 'w', 'b'];
 
+// routine pour AJAX ============================================
 var xmlhttp = new XMLHttpRequest();
-
 var ajaxRequest = function(url, func){
     var response = "{}";
     console.log(url);
@@ -21,8 +26,27 @@ var ajaxRequest = function(url, func){
     xmlhttp.open("GET", url, true);
     xmlhttp.send();
 };
+//================================================================
 
-// mode = "ia" or "human"
+// Routine pour attendre (pas tres tres propre) ==================
+/*var waitNotNull = function(list, func){
+	var waitProcess = setInterval(function(){
+	listNotNull = true;
+	for(var i = 0; i < list.length; i++){
+		console.log(list);
+		if(list[i] == null)
+			listNotNull = false;
+		}
+	
+		if(listNotNull){
+			clearInterval(waitProcess);
+			func();
+		}
+	}, 100);
+};*/
+// ================================================================
+
+// mode = "ia" or "humain"
 // id > 0
 var Player = function (mode, id, color, game) {
 
@@ -81,7 +105,7 @@ var Player = function (mode, id, color, game) {
 
     this.playIfHuman = function(hexa){
         if(!self.game.isBoardFull()) {
-            if (self.mode == 'human') {
+            if (self.mode == 'humain') {
                 // si la selection a fonctionne
                 if (self.select(hexa))
                     self.game.changePlayer();
@@ -118,7 +142,7 @@ var Hexagon = function (shape, id, game) {
     };
 };
 
-// player[1-2]Mode = "ia" or "human"
+// player[1-2]Mode = "ia" or "humain"
 var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
 
     //attributes
@@ -132,6 +156,8 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
 
     //methods
     this.launch = function(){
+    
+    	console.log(self.nbFloors);
 
         // padding pour eviter les depassements avec les approximations du rayon
         var padding = 50;
@@ -171,6 +197,7 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
             }
         }
 
+		// dans le cas ou le premier joueur est un IA, il faut le faire jouer
         self.currentPlayer.playIfIA();
     };
 
@@ -208,6 +235,10 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
     }
 };
 
-var yGame = new YGame(800, 600, 'human', 'ia');
+var modePlayer1 = prompt('Renseigner le mode de jeu du joueur 1', 'humain');
+var modePlayer2 = prompt('Renseigner le mode de jeu du joueur 2', 'ia');
+
+var yGame = new YGame(800, 600, modePlayer1, modePlayer2);
 yGame.launch();
+
 

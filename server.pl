@@ -9,27 +9,24 @@
 :- use_module(library(http/http_cors)).
 :- use_module(library(http/http_files)).
 
+% ======================== Includes
+
 :-consult(generateBoard).
 :-consult(move).
 :-consult(randomHeuristic).
 :-consult(minmax).
 
-:- multifile http:location/3.
-:- dynamic   http:location/3.
+% ======================== Utilitaires
 
-http:location(files, '/f', []).
+% Operation de deserialisation "elqsjdfml" => [e,l,q,s,j,d,f,m,l]
+string_to_list_of_characters(String, Characters) :-
+    name(String, Xs),
+    maplist( number_to_character,
+       Xs, Characters ).
 
-:- http_handler('/ia', ygame, []).
-:- http_handler('/init', init, []).
-:- http_handler('/ok', test, []).
-:- http_handler('/ygame', indexGame, [prefix]).
-
-:- http_handler(files(.), http_reply_from_files('web', []), [prefix]).
-
-:- json_object
-	response(prolog:any).
-
-
+number_to_character(Number, Character) :-
+    name(Character, [Number]).
+    
 % Start Server on port "Port"
 server(Port) :-
         http_server(http_dispatch, [port(Port)]).
@@ -38,51 +35,68 @@ server(Port) :-
 halt_server(Port) :- 
 	http_stop_server(Port,[]).
 
-test(_) :- cors_enable, reply_json('ok').
+% ======================== To serve html, css, json files
 
-indexGame(Request) :-
-	 http_reply_from_files('web', [], Request).
-indexGame(Request) :-
-	  http_404([], Request).
+:- multifile http:location/3.
+:- dynamic   http:location/3.
+http:location(files, '/f', []).
+:- json_object response(prolog:any).
+:- http_handler(files(.), http_reply_from_files('web', []), [prefix]).
+
+% ======================== Routes
+
+% Route pour demander un prochain coup a l IA
+% 	ex : localhost:8000/ia?board=webwebbeww&nexPlayer=b
+:- http_handler('/ia', ia, []).
+
+% Route pour initialiser la base de faits
+% 	ex : localhost:8000/init?nbFloors=8
+:- http_handler('/init', init, []).
+
+% Route pour servir le jeu en js
+% 	demander simplement localhost:8000/ygame
+:- http_handler('/ygame', ygame, [prefix]).
+
+% ======================== Handlers
+
+% Handler pour les fichiers
 
 serve_files(Request) :-
 	 http_reply_from_files('web', [], Request).
 serve_files(Request) :-
 	  http_404([], Request).
 
-% To be upgraded
-ygame(Request) :- 
+% Handler pour servir le jeu par navigateur
+ygame(Request) :-
+	 http_reply_from_files('web', [], Request).
+ygame(Request) :-
+	  http_404([], Request).
+
+% Handler pour demander un prochain coup de l IA
+ia(Request) :- 
 	cors_enable,
 	getTurnInfo(Request, Board, NextPlayer),
 	play(Board,NextPlayer,NextBoard),	
 	atomic_list_concat(NextBoard, ',', NextBoardSerialized),
 	prolog_to_json(response(NextBoardSerialized), ResponseSerialized),
 	reply_json(ResponseSerialized).
-	%reply_json('ok').
-	%reply_json(BoxPlayed).
 	
-	
-init(Request) :- 
-	cors_enable,
-	getNbFloors(Request, NbFloors),
-	generateGraph(NbFloors),
-	reply_json('{status="200 OK"}').
-
-
-% To be upgraded
 getTurnInfo(Request,Board, NextPlayer) :- 
 	http_parameters(Request, [board(BoardString, [default(7)])]), string_to_list_of_characters(BoardString, Board),
 	http_parameters(Request, [nextPlayer(NextPlayer, [default(7)])]).
 	
+% Handler pour demander une initialisation de la base de faits
+init(Request) :- 
+	cors_enable,
+	getNbFloors(Request, NbFloors),
+	generateGraph(NbFloors),
+	prolog_to_json(response('200 OK'), ResponseSerialized),
+	reply_json(ResponseSerialized).
 
 getNbFloors(Request,NbFloors) :- http_parameters(Request, [nbFloors(NbFloorsString, [default(7)])]), atom_number(NbFloorsString, NbFloors), !.
 
-%atomic_list_concat([d,z,f,s,g,hhj,ddf,d,s,ss,f],'-',Atom), atom_string(Atom, String).
+% ======================== Auto Launch
 
-string_to_list_of_characters(String, Characters) :-
-    name(String, Xs),
-    maplist( number_to_character,
-       Xs, Characters ).
+:- server(8000).
 
-number_to_character(Number, Character) :-
-    name(Character, [Number]).
+
