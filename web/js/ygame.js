@@ -62,7 +62,8 @@ var Player = function (mode, id, color, game) {
         return hexa.select(self);
     };
 
-    this.playIfIA = function(nbFloors){
+    this.playIfIA = function(){
+		var before = Date.now()
         if(!self.game.isBoardFull()) {
             if (self.mode == 'ia') {
 
@@ -78,8 +79,10 @@ var Player = function (mode, id, color, game) {
                         newBoardSerialized += colors[self.id];
                 }*/
                 //=====================
-                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id] + '&nbFloors=' + nbFloors , function(resp){
-                    
+                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id]+ '&nbFloors=' + self.game.nbFloors , function(resp){
+
+					console.log('Temps de jeu de ia : ' + (Date.now()-before).toString())
+				
                     var newBoardSerialized = JSON.parse(resp).prolog.split(',').join('');
 
                     hexaSelected = null;
@@ -198,7 +201,8 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
         }
 
 		// dans le cas ou le premier joueur est un IA, il faut le faire jouer
-        self.currentPlayer.playIfIA(self.nbFloors);
+
+        self.currentPlayer.playIfIA();
     };
 
     this.changePlayer = function(){
@@ -207,7 +211,7 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
         else
             self.currentPlayer = self.player1;
 
-        self.currentPlayer.playIfIA(self.nbFloors);
+        self.currentPlayer.playIfIA();
     };
 
     this.getFirstEmptyHexa = function(){
