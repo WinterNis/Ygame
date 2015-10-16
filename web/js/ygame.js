@@ -63,6 +63,7 @@ var Player = function (mode, id, color, game) {
     };
 
     this.playIfIA = function(){
+		
         if(!self.game.isBoardFull()) {
             if (self.mode == 'ia') {
 
@@ -78,8 +79,10 @@ var Player = function (mode, id, color, game) {
                         newBoardSerialized += colors[self.id];
                 }*/
                 //=====================
+				var before = Date.now()
                 var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id], function(resp){
-                    
+					console.log('Temps de jeu de ia : ' + (Date.now()-before).toString())
+				
                     var newBoardSerialized = JSON.parse(resp).prolog.split(',').join('');
 
                     hexaSelected = null;
@@ -207,6 +210,7 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
         else
             self.currentPlayer = self.player1;
 
+		
         self.currentPlayer.playIfIA();
     };
 
