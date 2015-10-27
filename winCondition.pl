@@ -47,13 +47,13 @@ win(V,C) :- playerVertices(V,C,P),separateIntoIslets(P,I),hasAWinningIslet(I).
 playerVertices(V, C, P) :- setof(I,nth0(I,V,C),P).
 
 %hasAWinningIslet(+Islets)
-hasAWinningIslet([I|_]) :- hasAVerticeOnEdge(I,1),hasAVerticeOnEdge(I,2),hasAVerticeOnEdge(I,3).
-hasAWinningIslet([I|T]) :- member(E,[1,2,3]),not(hasAVerticeOnEdge(I,E)),hasAWinningIslet(T).
+hasAWinningIslet([I|_]) :- hasAVerticeOnEdge(I,1),hasAVerticeOnEdge(I,2),hasAVerticeOnEdge(I,3),!.
+hasAWinningIslet([_|T]) :- hasAWinningIslet(T).
 
 
 %hasAVerticeOnEdge(+Islet, +EdgeNumber)
 hasAVerticeOnEdge([X|_],E) :- verticeOnEdge(X,E).
-hasAVerticeOnEdge([X|T],E) :- member(E,[1,2,3]),not(verticeOnEdge(X,E)),hasAVerticeOnEdge(T,E).
+hasAVerticeOnEdge([_|T],E) :- hasAVerticeOnEdge(T,E),!.
 
 
 %separateIntoIslets(+PlayerVertices, -Islets)
