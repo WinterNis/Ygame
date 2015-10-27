@@ -52,8 +52,8 @@ hasAWinningIslet([_|T]) :- hasAWinningIslet(T).
 
 
 %hasAVerticeOnEdge(+Islet, +EdgeNumber)
-hasAVerticeOnEdge([X|_],E) :- verticeOnEdge(X,E).
-hasAVerticeOnEdge([_|T],E) :- hasAVerticeOnEdge(T,E),!.
+hasAVerticeOnEdge([X|_],E) :- verticeOnEdge(X,E),!.
+hasAVerticeOnEdge([_|T],E) :- hasAVerticeOnEdge(T,E).
 
 
 %separateIntoIslets(+PlayerVertices, -Islets)
