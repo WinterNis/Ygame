@@ -13,8 +13,10 @@ final(V,min) :- win(V,b),!.
     Return the number of elements after the vertice in the axis X
 */
 
-%nextXPlus(V,X) :- 
-%coutXPlus(V,N) :- .
+coutXPlus(V,N) :- nextXPlus(V,VNext), coutXPlus(VNext,N1), N is N1+1,!.
+coutXPlus(_,0).
+
+nextXPlus(V,X) :- currentFloor(V,F), Xtest is V-F+1, Xtest =\= 1, arc(Xtest,V), X is Xtest.
 
 /**addFloor(Vertice,Sum,CurrentFloor,FloorFinale)
 The idea is to begin from 0, to add the number of vertices of each level, until we reach the right vertice at the right floor.
