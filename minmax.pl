@@ -1,6 +1,7 @@
 :-consult(generateBoard).
 :-consult(move).
 :-consult(randomHeuristic).
+:-consult(centerHeuristic).
 
 /**
 maxN([pairlist[evaluation, configuration]],[evaluationMax,configurationMax])
@@ -24,8 +25,11 @@ minN([[X1|_]|Xs],[N|QN]):- minN(Xs,[N|QN]), N < X1.
 From a current configuration and a player, calculate the best next configuration and the corresponding evaluation
 */
 
-minimax(_,V,Eval,V,_) :- final(V,_),hRandom(V,Eval),!.
-minimax(_,V,Eval,V,Depth) :- hRandom(V,Eval), Depth == 0,!.
+%minimax(_,V,Eval,V,_) :- final(V,_),hRandom(V,Eval),!.
+%minimax(_,V,Eval,V,Depth) :- hRandom(V,Eval), Depth == 0,!.
+
+minimax(_,V,Eval,V,_) :- final(V,_),hCenter(V,Eval),!.
+minimax(_,V,Eval,V,Depth) :- hCenter(V,Eval), Depth == 0,!.
 
 minimax(w,V,Eval,VNext,Depth) :- DepthNext is Depth-1,
 	setof([TestEval,TestNext],combiMoveMinimax(V,w,b,TestNext,TestEval,DepthNext),Evals),
