@@ -1,6 +1,7 @@
 :-consult(generateBoard).
 :-consult(move).
 :-consult(randomHeuristic).
+:-consult(centerHeuristic).
 
 % maxN(+[[Eval,Position]], -[BestEval,Position])
 % Get the best couple (ordered on the Eval) from the list of couple [Eval,Position]
@@ -8,6 +9,7 @@
 maxN([X],X).
 maxN([[X1|L]|Xs],[X1|L]):- maxN(Xs,[Y|_]), X1 >=Y.
 maxN([[X1|_]|Xs],[N|QN]):- maxN(Xs,[N|QN]), N > X1.
+
 
 
 % minN(+[[Eval,Position]], -[BestEval,Position])
@@ -39,6 +41,7 @@ minimax(b,V,Eval,VNext,Depth) :- DepthNext is Depth-1,
 % DepthNext is necessary because combiMoveMinimax needs to call minimax.
 %
 combiMoveMinimax(V,X,Y,TestNext,TestEval,DepthNext) :- move(V,X,TestNext),minimax(Y,TestNext,TestEval,_,DepthNext).
+
 
 %testJeu(N,LNext) :- generateGraph(N), generateVerticesEmptyList(N,L), minimax(w,L,_,LNext,2).
 testJeu(_,LNext) :- minimax(w,[b,b,e,e,w,e],_,LNext,1).
