@@ -79,7 +79,7 @@ var Player = function (mode, id, color, game) {
                         newBoardSerialized += colors[self.id];
                 }*/
                 //=====================
-				var before = Date.now()
+				var before = Date.now();
                 var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id], function(resp){
 					console.log('Temps de jeu de ia : ' + (Date.now()-before).toString())
 				
@@ -94,8 +94,8 @@ var Player = function (mode, id, color, game) {
 
                     if(hexaSelected == null){
                         self.select(self.game.getFirstEmptyHexa());
-			console.log("serveur renvoi mal")	    
-		    }
+			            console.log("serveur renvoi mal")
+		            }
                     else
                         self.select(self.game.listHexas[hexaSelected]);
                     self.game.changePlayer();
@@ -137,6 +137,7 @@ var Hexagon = function (shape, id, game) {
     this.select = function(player){
         if(self.state == 0){
             shape.fillColor = player.color;
+            paper.view.draw();
             self.state = player.id;
             return true;
         } else {
