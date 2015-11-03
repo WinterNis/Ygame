@@ -45,10 +45,10 @@ combiMoveMinimax(V,X,Y,TestNext,TestEval,DepthNext,Sel) :- move(V,X,TestNext),mi
 %testJeu(N,LNext) :- generateGraph(N), generateVerticesEmptyList(N,L), minimax(w,L,_,LNext,2).
 testJeu(_,LNext) :- minimax(w,[b,b,e,e,w,e],_,LNext,1).
 
+
 %play(C,P,CNext) :- minimax(P,C,_,CNext,2).
 play(C,P,CNext) :- play(C,P,CNext, "random", 1).
 play(C,P,CNext,Sel, Depth) :- alphabeta(P,C,_,CNext,Depth, -101,101,Sel).
-
 
 
 % alphabeta((Same as minimax), +Alpha, +Beta, +SelectedHeuristic)
@@ -108,21 +108,21 @@ uList(X, [H|T], L) :- uList(X, T, Rtn), L = [H|Rtn].
 % updateAlpha(+Alpha, +Val, +Player, -NewAlpha)
 % update alpha as the max between alpha and the current value.
 %
-updateAlpha(Alpha, _, Player, NewAlpha) :- Player == 'b', NewAlpha is Alpha.
-updateAlpha(Alpha, Val, Player, NewAlpha) :- Player == 'w', NewAlpha is max(Alpha,Val).
+updateAlpha(Alpha, _, 'b', NewAlpha) :- NewAlpha is Alpha.
+updateAlpha(Alpha, Val, 'w', NewAlpha) :- NewAlpha is max(Alpha,Val).
 
 
 % updateBeta(+Beta, +Val, +Player, -NewBeta)
 % update beta as the min between beta and the current value.
 %
-updateBeta(Beta, _, Player, NewBeta) :-Player == 'w', NewBeta is Beta.
-updateBeta(Beta, Val, Player, NewBeta) :- Player == 'b', NewBeta is min(Beta,Val).
+updateBeta(Beta, _, 'w', NewBeta) :- NewBeta is Beta.
+updateBeta(Beta, Val, 'b', NewBeta) :- NewBeta is min(Beta,Val).
 
 % prune(+Val,+AlphaBeta, +Player)
 % Pruning condition. Pruning needs to happen if pruneAlphaBeta is evaluate to false.
 %
 pruneAlpha(_,_,'w').  %Never pruneAlpha when player is white.
-pruneAlpha(Val,Alpha, Player) :- Player=='b', Val > Alpha.
+pruneAlpha(Val,Alpha, 'b') :- Val > Alpha.
 
 pruneBeta(_,_, 'b').   %Never pruneBeta when player is black.
-pruneBeta(Val,Beta, Player) :- Player=='w', Val < Beta.
+pruneBeta(Val,Beta, 'w') :- Val < Beta.
