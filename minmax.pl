@@ -48,7 +48,7 @@ testJeu(_,LNext) :- minimax(w,[b,b,e,e,w,e],_,LNext,1).
 
 play(C,P,CNext) :- play(C,P,CNext, "center").
 %play(C,P,CNext,Sel) :- minimax(P,C,_,CNext,1,Sel).
-play(C,P,CNext,Sel) :- alphabeta(P,C,_,CNext,3, -101,101,Sel).
+play(C,P,CNext,Sel) :- alphabeta(P,C,_,CNext,1, -101,101,Sel).
 
 
 
