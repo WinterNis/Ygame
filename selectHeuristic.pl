@@ -6,6 +6,6 @@
 %
 %
 heuristic(V, Eval, Select) :-
-				Select == "random" -> hRandom(V,Eval);
-				Select == "connect" -> hConnect(V,Eval);
-				Select == "center" -> hCenter(V,Eval). 
+				Select == random -> hRandom(V,Eval);
+				Select == connect -> hConnect(V,Eval);
+				Select == center -> hCenter(V,Eval). 
