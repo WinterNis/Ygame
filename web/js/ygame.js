@@ -9,6 +9,7 @@
 	- couleur d'une case occupee par joueur 2 : b
 */	
 var colors = ['e', 'w', 'b'];
+var hexaColors = {'w' : 'Bleu', 'b' : 'Rouge'};
 
 // routine pour AJAX ============================================
 var xmlhttp = new XMLHttpRequest();
@@ -28,23 +29,55 @@ var ajaxRequest = function(url, func){
 };
 //================================================================
 
-// Routine pour attendre (pas tres tres propre) ==================
-/*var waitNotNull = function(list, func){
-	var waitProcess = setInterval(function(){
-	listNotNull = true;
-	for(var i = 0; i < list.length; i++){
-		console.log(list);
-		if(list[i] == null)
-			listNotNull = false;
-		}
-	
-		if(listNotNull){
-			clearInterval(waitProcess);
-			func();
-		}
-	}, 100);
-};*/
-// ================================================================
+
+var WinCondition = {
+
+    // Retourne la positions d'un hexagone dans la liste en fonction de ses coord dans la pyramide
+    getHexaPosition : function (etage, rang) {
+        return etage / 2 * (etage-1) + rang - 1;
+    },
+
+    // Retourne la dominance entre trois hexagones
+    getDominance : function (hexa1, hexa2, hexa3){
+        var dominance = {
+            w : 0,
+            b : 0,
+            e : 0
+        };
+
+        dominance[hexa1]++;
+        dominance[hexa2]++;
+        dominance[hexa3]++;
+
+        if(dominance.w >= 2)
+            return 'w';
+        else if(dominance.b >= 2)
+            return 'b';
+        else
+            return 'e';
+    },
+
+    // Simplifie de facon recursive la pyramide de maniere recursive
+    // A chaque iteration, on synthetise les dominances des haxagones par groupe de trois pour former une pyramide avec un etage de moins
+    simplify : function(listHexas, nbEtages) {
+
+        var newListHexas = [];
+
+        if (nbEtages == 1)
+            return listHexas[0];
+        else {
+            for (var i = 1; i <= nbEtages - 1; i++) {
+                for (var j = 1; j <= i; j++) {
+                    hexa1 = listHexas[WinCondition.getHexaPosition(i, j)];
+                    hexa2 = listHexas[WinCondition.getHexaPosition(i + 1, j)];
+                    hexa3 = listHexas[WinCondition.getHexaPosition(i + 1, j + 1)];
+                    newListHexas.push(WinCondition.getDominance(hexa1, hexa2, hexa3));
+                }
+            }
+            return WinCondition.simplify(newListHexas, nbEtages - 1);
+        }
+    }
+}
 
 // mode = "ia" or "humain"
 // id > 0
@@ -63,8 +96,10 @@ var Player = function (mode, id, color, game) {
     };
 
     this.playIfIA = function(){
-		
-        if(!self.game.isBoardFull()) {
+
+        var winner = self.game.winner();
+
+        if(winner == 'e') {
             if (self.mode == 'ia') {
 
                 //====================
@@ -102,19 +137,21 @@ var Player = function (mode, id, color, game) {
                 });
             }
         } else {
-            alert('Le plateau de jeu est rempli.');
+            alert('Le joueur ' + hexaColors[winner] + ' gagne.');
         }
     };
 
     this.playIfHuman = function(hexa){
-        if(!self.game.isBoardFull()) {
+        var winner = self.game.winner();
+
+        if(winner == 'e') {
             if (self.mode == 'humain') {
                 // si la selection a fonctionne
                 if (self.select(hexa))
                     self.game.changePlayer();
             }
         } else {
-            alert('Le plateau de jeu est rempli.');
+            alert('Le joueur ' + hexaColors[winner] + ' gagne.');
         }
     };
 };
@@ -151,7 +188,7 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
 
     //attributes
     var self = this;
-    this.nbFloors = parseInt(prompt('Renseigner le nombre d\'étages du plateau de jeu', '8'));
+    this.nbFloors = parseInt(prompt('Renseigner le nombre d\'étages du plateau de jeu', '5'));
     this.canvasHeight = canvasHeight;
     this.player1 = new Player(player1Mode, 1, "blue", self);
     this.player2 = new Player(player2Mode, 2, "red", self);
@@ -230,6 +267,10 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
         return true;
     };
 
+    this.winner = function(){
+        return WinCondition.simplify(self.getBoard(), self.nbFloors);
+    };
+
     this.getSerializedBoard = function(){
         var serializedBoard = '';
 
@@ -237,6 +278,15 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
             serializedBoard += colors[self.listHexas[i].state];
         }
         return serializedBoard;
+    };
+
+    this.getBoard = function(){
+        var board = [];
+
+        for(var i = 0; i < self.listHexas.length; i++){
+            board.push(colors[self.listHexas[i].state]);
+        }
+        return board;
     }
 };
 
