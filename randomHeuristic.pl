@@ -15,8 +15,8 @@ Instead of picking a random vertice, we generate a random evaluation from -100 t
 so that we keep the idea of evaluating positions in all our heuristics.
 */
 
-hRandom(V,100) :- final(V,max),!. 
-hRandom(V,-100) :- final(V,min),!.	
+%hRandom(V,100) :- final(V,max),!. 
+%hRandom(V,-100) :- final(V,min),!.	
 
 hRandom(_,R) :- X is random(200), R is X -100 .
 

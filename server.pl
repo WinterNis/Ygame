@@ -75,16 +75,17 @@ ygame(Request) :-
 % Handler pour demander un prochain coup de l IA
 ia(Request) :- 
 	cors_enable,
-	getTurnInfo(Request, Board, NextPlayer, Heuristic),
-	play(Board,NextPlayer,NextBoard, Heuristic),	
+	getTurnInfo(Request, Board, NextPlayer, Heuristic, Depth),
+	play(Board,NextPlayer,NextBoard, Heuristic, Depth),	
 	atomic_list_concat(NextBoard, ',', NextBoardSerialized),
 	prolog_to_json(response(NextBoardSerialized), ResponseSerialized),
 	reply_json(ResponseSerialized).
 	
-getTurnInfo(Request,Board, NextPlayer, Heuristic) :- 
+getTurnInfo(Request,Board, NextPlayer, Heuristic, Depth) :- 
 	http_parameters(Request, [board(BoardString, [default(7)])]), string_to_list_of_characters(BoardString, Board),
 	http_parameters(Request, [nextPlayer(NextPlayer, [default(7)])]),
-	http_parameters(Request, [heuristic(Heuristic, [default("random")])]).
+	http_parameters(Request, [heuristic(Heuristic, [default("random")])]),
+	http_parameters(Request, [depth(DepthString, [default(1)])]),  atom_number(DepthString, Depth).
 	
 % Handler pour demander une initialisation de la base de faits
 init(Request) :- 

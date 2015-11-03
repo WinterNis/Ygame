@@ -81,12 +81,13 @@ var WinCondition = {
 
 // mode = "ia" or "humain"
 // id > 0
-var Player = function (mode, id, color, game, heuristic) {
+var Player = function (mode, id, color, game, heuristic, depth) {
 
     // attributes
     var self = this;
     this.mode = mode;
-	this.heuristic = heuristic
+	this.heuristic = heuristic;
+	this.depth = depth;
     this.color = color;
     this.id = id;
     this.game = game;
@@ -116,7 +117,7 @@ var Player = function (mode, id, color, game, heuristic) {
                 }*/
                 //=====================
 				var before = Date.now();
-                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id] + '&heuristic=' + self.heuristic, function(resp){
+                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id] + '&heuristic=' + self.heuristic + '&depth=' + self.depth, function(resp){
 					console.log('Temps de jeu de ia : ' + (Date.now()-before).toString())
 				
                     var newBoardSerialized = JSON.parse(resp).prolog.split(',').join('');
@@ -185,14 +186,14 @@ var Hexagon = function (shape, id, game) {
 };
 
 // player[1-2]Mode = "ia" or "humain"
-var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode, player1Heuristic, player2Heuristic) {
+var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode, player1Heuristic, player2Heuristic, player1Depth, player2Depth) {
 
     //attributes
     var self = this;
     this.nbFloors = parseInt(prompt('Renseigner le nombre d\'étages du plateau de jeu', '5'));
     this.canvasHeight = canvasHeight;
-    this.player1 = new Player(player1Mode, 1, "blue", self, player1Heuristic);
-    this.player2 = new Player(player2Mode, 2, "red", self, player2Heuristic);
+    this.player1 = new Player(player1Mode, 1, "blue", self, player1Heuristic, player1Depth);
+    this.player2 = new Player(player2Mode, 2, "red", self, player2Heuristic, player2Depth);
     this.currentPlayer = this.player1;
     this.listHexas = [];
 
@@ -293,16 +294,20 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode, player
 
 var modePlayer1 = prompt('Renseigner le mode de jeu du joueur 1', 'humain');
 var heuristicPlayer1 = null;
+var depthPlayer1 = 0;
 if(modePlayer1 == 'ia'){
-    var heuristicPlayer1 = prompt('Renseigner l\'heuristique d\'ia à utiliser', 'random');
+    heuristicPlayer1 = prompt('Renseigner l\'heuristique d\'ia à utiliser', 'random');
+	depthPlayer1 = prompt('Renseigner la profondeur de l\'ia', 1);
 }
 var modePlayer2 = prompt('Renseigner le mode de jeu du joueur 2', 'ia');
 var heuristicPlayer2 = null;
+var depthPlayer2 = 0;
 if(modePlayer2 == 'ia'){
-    var heuristicPlayer2 = prompt('Renseigner l\'heuristique d\'ia à utiliser', 'random');
+    heuristicPlayer2 = prompt('Renseigner l\'heuristique d\'ia à utiliser', 'random');
+	depthPlayer2 = prompt('Renseigner la profondeur de l\'ia', 1);
 } 
 
-var yGame = new YGame(800, 600, modePlayer1, modePlayer2, heuristicPlayer1, heuristicPlayer2);
+var yGame = new YGame(800, 600, modePlayer1, modePlayer2, heuristicPlayer1, heuristicPlayer2, depthPlayer1, depthPlayer2);
 yGame.launch();
 
 
