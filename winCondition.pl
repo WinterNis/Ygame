@@ -40,7 +40,12 @@ verticeOnEdge(0,3).
 */
 
 %win(+Vertices, +PlayerColor)
-win(V,C) :- playerVertices(V,C,P),separateIntoIslets(P,I),hasAWinningIslet(I).
+%implemented with connexity checks
+%win(V,C) :- playerVertices(V,C,P),separateIntoIslets(P,I),hasAWinningIslet(I).
+
+%win(+Vertices, +PlayerColor)
+%implemented with the method of equivalency of a smaller board
+win(V,C) :- sizeOfBoard(V,Size), recShrinkBoard(V, C, Size).
 
 %List of vertices owned by a player.
 %playerVertices(+Vertices, +PlayerColor, -PlayerVertices)
@@ -79,3 +84,53 @@ connected(X,Y,P) :- path(X,Y,P,[X],_),!.
 path(X,X,_,V,V).
 path(X,Y,P,V,T) :- member(Z,P),not(member(Z,V)),arc(X,Z),path(Z,Y,P,[Z|V],T).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+recShrinkBoard(Board, Dominant, 2) :- getDominance(Board,Dominant), !.
+recShrinkBoard(Board, Dominant, Size) :- Size1 is Size-1, createBoardMinusOne(Board, BoardNext, Size1), recShrinkBoard(BoardNext,Dominant,Size1).
+
+createBoardMinusOne( BoardBefore, BoardAfter, SizeNewBoard) :- Cursor is ((SizeNewBoard * (SizeNewBoard+1)/2) -1) ,addElemInNewBoard(BoardBefore,Cursor, [], BoardAfter).
+
+
+addElemInNewBoard(Board, 0, NewBoard, NewBoardFinal) :- 		getTriangle(Board,0,ListOfThree), 
+															getDominance(ListOfThree, Color), 
+															NewBoardFinal = [Color|NewBoard].
+															
+addElemInNewBoard(Board, Cursor, NewBoard, NewBoardFinal) :- 	getTriangle(Board,Cursor,ListOfThree), 
+																getDominance(ListOfThree, Color), 
+																NewBoard1 = [Color|NewBoard],
+																Cursor1 is Cursor-1,
+																addElemInNewBoard(Board, Cursor1, NewBoard1, NewBoardFinal). 
+
+getTriangle(Board, Vertice, ListOfElementsInTheTriangle) :- L1 = [] ,nth0(Vertice, Board, Elem1), L2 = [Elem1|L1],
+															currentFloor(Vertice, F), V is Vertice+F, nth0(V, Board, Elem2), L3 = [Elem2|L2],
+															V2 is V+1, nth0(V2, Board, Elem3), ListOfElementsInTheTriangle = [Elem3|L3].
+
+%
+% Find the color of the dominant Player in the elements of a triangle.
+%
+getDominance(ListOfThree, Color) :- getDominance(ListOfThree, 0,0, Color).
+getDominance([], _, NbB, b) :- NbB > 1 ,!. 
+getDominance([], NbW, _, w) :- NbW > 1 ,!. 
+getDominance([], _, _, e). 
+getDominance([w|Q], NbW, NbB, Color) :- NbW1 is NbW+1, getDominance(Q, NbW1, NbB, Color).    
+getDominance([b|Q], NbW, NbB, Color) :- NbB1 is NbB+1, getDominance(Q, NbW, NbB1, Color).
+getDominance([e|Q], NbW, NbB, Color) :- getDominance(Q, NbW, NbB, Color).
+																
+
+sizeOfBoard(Board, Size) :- length(Board,Length) ,Length1 is Length-1, currentFloor(Length1,Size).
+
+
+/**addFloor(Vertice,Sum,CurrentFloor,FloorFinale)
+The idea is to begin from 0, to add the number of vertices of each level, until we reach the right vertice at the right floor.
+*/
+addFloor(V,0,0,F) :- V>0, addFloor(V,0,1,F),!. % we do that to make sure that is working with 0
+addFloor(_,0,0,F) :- F is 1,!.
+addFloor(V,N,C,F) :- V > N, F1 is C+1, N1 is N+F1,addFloor(V,N1,F1,F),!.
+addFloor(_,_,C,F) :- F is C. %we come here only at the end 
+
+/**
+Get the current floor in a better way than into generateBoard
+*/
+currentFloor(V,F) :- addFloor(V,0,0,F).

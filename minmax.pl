@@ -82,12 +82,12 @@ combiMoveAlphabeta(V,ListToAvoid,X,Y,TestNext,TestEval,DepthNext,Alpha, Beta, Se
 % 
 find(V, Res, Player, Opponent, Depth, Alpha, Beta, Sel) :- find(V, [], Res, Player, Opponent, Depth, Alpha, Beta, Sel), !.
 find(V, Acc, Res, Player, Opponent, Depth, Alpha, Beta, Sel) :-
-	combiMoveAlphabeta(V, Acc, Player, Opponent,TestNext,TestEval,Depth,Alpha, Beta, Sel),!,
+	combiMoveAlphabeta(V, Acc, Player, Opponent,TestNext,TestEval,Depth,Alpha, Beta, Sel), !,
 	(pruneAlpha(TestEval,Alpha,Player),                           % If min plays, he can eventually do an alpha prune.
 	pruneBeta(TestEval, Beta, Player)) -> (                       % If max plays, he can eventually do a beta prune.
 		uList([TestEval,TestNext], Acc, AccNew),
 		updateBeta(Beta,TestEval,Player,NewBeta),                 % If min plays, he updates beta.
-		updateAlpha(Alpha,TestEval,Player,NewAlpha),              % If max plays, he updates alpha.
+		updateAlpha(Alpha,TestEval,Player,NewAlpha),           	  % If max plays, he updates alpha.
 		find(V, AccNew, Res, Player, Opponent, Depth, NewAlpha, NewBeta, Sel)).
 
 % End of the recursion when Acc and Res are the same list.
