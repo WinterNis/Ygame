@@ -139,7 +139,10 @@ var Player = function (mode, id, color, game, heuristic, depth) {
                 });
             }
         } else {
-            alert('Le joueur ' + hexaColors[winner] + ' gagne.');
+            var c = confirm('Le joueur ' + hexaColors[winner] + ' gagne. Rejouer ?');
+			if(c == true){
+				game.reset();
+			}
         }
     };
 
@@ -153,7 +156,10 @@ var Player = function (mode, id, color, game, heuristic, depth) {
                     self.game.changePlayer();
             }
         } else {
-            alert('Le joueur ' + hexaColors[winner] + ' gagne.');
+            var c = confirm('Le joueur ' + hexaColors[winner] + ' gagne. Rejouer ?');
+			if(c == true){
+				game.reset();
+			}
         }
     };
 };
@@ -197,7 +203,15 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode, player
     this.currentPlayer = this.player1;
     this.listHexas = [];
 
+	
     //methods
+	
+	this.reset = function(){
+		this.listHexas = [];
+		self.currentPlayer = this.player1;
+		this.launch();
+	}
+	
     this.launch = function(){
     
     	console.log(self.nbFloors);
