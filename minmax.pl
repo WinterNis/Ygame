@@ -46,10 +46,9 @@ combiMoveMinimax(V,X,Y,TestNext,TestEval,DepthNext,Sel) :- move(V,X,TestNext),mi
 testJeu(_,LNext) :- minimax(w,[b,b,e,e,w,e],_,LNext,1).
 
 
-play(C,P,CNext) :- play(C,P,CNext, "center").
-%play(C,P,CNext,Sel) :- minimax(P,C,_,CNext,1,Sel).
-play(C,P,CNext,Sel) :- alphabeta(P,C,_,CNext,1, -101,101,Sel).
-
+%play(C,P,CNext,Sel, Depth) :- minimax(P,C,_,CNext,Depth, Sel).
+play(C,P,CNext) :- play(C,P,CNext, "random", 1).
+play(C,P,CNext,Sel, Depth) :- alphabeta(P,C,_,CNext,Depth, -101,101,Sel).
 
 
 % alphabeta((Same as minimax), +Alpha, +Beta, +SelectedHeuristic)
