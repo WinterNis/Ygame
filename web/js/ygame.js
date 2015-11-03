@@ -81,11 +81,12 @@ var WinCondition = {
 
 // mode = "ia" or "humain"
 // id > 0
-var Player = function (mode, id, color, game) {
+var Player = function (mode, id, color, game, heuristic) {
 
     // attributes
     var self = this;
     this.mode = mode;
+	this.heuristic = heuristic
     this.color = color;
     this.id = id;
     this.game = game;
@@ -115,7 +116,7 @@ var Player = function (mode, id, color, game) {
                 }*/
                 //=====================
 				var before = Date.now();
-                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id], function(resp){
+                var response = ajaxRequest('ia?board=' + prevBoardSerialized + '&nextPlayer=' + colors[self.id] + '&heuristic=' + self.heuristic, function(resp){
 					console.log('Temps de jeu de ia : ' + (Date.now()-before).toString())
 				
                     var newBoardSerialized = JSON.parse(resp).prolog.split(',').join('');
@@ -184,14 +185,14 @@ var Hexagon = function (shape, id, game) {
 };
 
 // player[1-2]Mode = "ia" or "humain"
-var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
+var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode, player1Heuristic, player2Heuristic) {
 
     //attributes
     var self = this;
     this.nbFloors = parseInt(prompt('Renseigner le nombre d\'étages du plateau de jeu', '5'));
     this.canvasHeight = canvasHeight;
-    this.player1 = new Player(player1Mode, 1, "blue", self);
-    this.player2 = new Player(player2Mode, 2, "red", self);
+    this.player1 = new Player(player1Mode, 1, "blue", self, player1Heuristic);
+    this.player2 = new Player(player2Mode, 2, "red", self, player2Heuristic);
     this.currentPlayer = this.player1;
     this.listHexas = [];
 
@@ -291,9 +292,17 @@ var YGame = function(canvasWidth, canvasHeight, player1Mode, player2Mode) {
 };
 
 var modePlayer1 = prompt('Renseigner le mode de jeu du joueur 1', 'humain');
+var heuristicPlayer1 = null;
+if(modePlayer1 == 'ia'){
+    var heuristicPlayer1 = prompt('Renseigner l\'heuristique d\'ia à utiliser', 'random');
+}
 var modePlayer2 = prompt('Renseigner le mode de jeu du joueur 2', 'ia');
+var heuristicPlayer2 = null;
+if(modePlayer2 == 'ia'){
+    var heuristicPlayer2 = prompt('Renseigner l\'heuristique d\'ia à utiliser', 'random');
+} 
 
-var yGame = new YGame(800, 600, modePlayer1, modePlayer2);
+var yGame = new YGame(800, 600, modePlayer1, modePlayer2, heuristicPlayer1, heuristicPlayer2);
 yGame.launch();
 
 
