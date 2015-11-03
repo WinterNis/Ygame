@@ -97,8 +97,8 @@ getScoreNormalized(V,b,R) :- getScore(V,b,0,S), length(V,X), getMaxScore(X,Y), R
 /** hCenter(+vertices,+player,-grade)
 Give grade to the current configuration.
 */
-hCenter(V,_,100) :- final(V,max),!. 
-hCenter(V,_,-100) :- final(V,min),!.	
+hCenter(V,100) :- final(V,max),!. 
+hCenter(V,-100) :- final(V,min),!.	
 
 hCenter(V,R) :- getScoreNormalized(V,w,X1), getScoreNormalized(V,b,X2), R is X1+X2.
 
