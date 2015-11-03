@@ -28,7 +28,9 @@ list_min([], Min, Min).
 list_min([L|Ls], Min0, Min) :- Min1 is min(L, Min0),list_min(Ls, Min1, Min).
 
 %minDistSumIslets(+Islets, +VisitableVertices, -DistSum)
-minDistSumIslets(I,V,D) :- setof(X,(Y^member(Y,I),distSumIslet(Y,V,X)),L),list_min(L,D).
+minDistSumIslets(I,V,D) :- setof(X,getSetOfDistSumIslets(X,I,V),L),list_min(L,D).
+
+getSetOfDistSumIslets(X,I,V) :- member(Y,I), distSumIslet(Y,V,X).
 
 %distSumIslet(+Islet, +VisitableVertices, -DistSum)
 distSumIslet(I,V,D) :- minLengthToEdge(I,1,V,L1),minLengthToEdge(I,2,V,L2),minLengthToEdge(I,3,V,L3),D is L1+L2+L3.
