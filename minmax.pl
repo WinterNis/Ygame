@@ -109,14 +109,14 @@ uList(X, [H|T], L) :- uList(X, T, Rtn), L = [H|Rtn].
 % update alpha as the max between alpha and the current value.
 %
 updateAlpha(Alpha, _, 'b', NewAlpha) :- NewAlpha is Alpha.
-updateAlpha(Alpha, Val, 'w', NewAlpha) :- NewAlpha is max(Alpha,Val).
+updateAlpha(Alpha, Val, 'w', NewAlpha) :- NewAlpha is max(Alpha,Val),!.
 
 
 % updateBeta(+Beta, +Val, +Player, -NewBeta)
 % update beta as the min between beta and the current value.
 %
 updateBeta(Beta, _, 'w', NewBeta) :- NewBeta is Beta.
-updateBeta(Beta, Val, 'b', NewBeta) :- NewBeta is min(Beta,Val).
+updateBeta(Beta, Val, 'b', NewBeta) :- NewBeta is min(Beta,Val),!.
 
 % prune(+Val,+AlphaBeta, +Player)
 % Pruning condition. Pruning needs to happen if pruneAlphaBeta is evaluate to false.
