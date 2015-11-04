@@ -41,10 +41,20 @@ minLengthToEdge(I,E,V,M) :- setof(X,lengthToEdge(I,E,V,X),L),list_min(L,M).
 %lengthToEdge(+Islet, +Edge, +VisitableVertices, -Length)
 lengthToEdge(I,E,V,L) :- member(X,I),verticeOnEdge(Y,E),minPathLength(X,Y,V,L).
 
-%minPathLength(+StartingVertice, +EndingVertice, +VisitableVertices, -Length)
-minPathLength(S,E,V,M) :- setof(X,pathLength(S,E,V,X),L),list_min(L,M).
+%minPathLength(+StartingVertice, +Goal, +PlayerVertices, -Length)
+minPathLength(S,G,P,L) :- empty_assoc(D),put_assoc(S,D,0,D2),minPathLength1([S],G,[S],P,D2,L).
+% minPathLength(+FIFO, +Goal, +VisitedVertex, +PlayerVertices, +AssocDistances, -Length)
+minPathLength1([S|_],G,_,P,A,L1) :- arc(S,G),member(G,P),get_assoc(S,A,L),L1 is L + 1,!.
+minPathLength1([S|T],G,V,P,A,L) :- findall(X,(arc(S,X),not(member(X,V)),member(X,P)),E),
+				   append(T,E,F),
+				   append(V,E,V2),
+				   get_assoc(S,A,D1),
+				   D2 is D1 + 1,
+				   put_assoc_list(E,A,D2,A2),
+				   minPathLength1(F,G,V2,P,A2,L).
 
-%pathLength(+StartingVertice, +EndingVertice, +VisitableVertices, -Length)
-pathLength(S,E,V,L) :- path(S,E,V,[S],C),length(C,L).
+%put_assoc_list(+KeyList, +Assoc, +Value, -NewAssoc).
+put_assoc_list([],A,_,A).
+put_assoc_list([H|T],A,V,N) :- put_assoc(H,A,V,A2),put_assoc_list(T,A2,V,N).
 
 
