@@ -13,8 +13,8 @@
 %a2 = 100
 %b2 = 0
 
-hConnect(V,100) :- final(V,max),!. 
-hConnect(V,-100) :- final(V,min),!.
+hConnect(V,100) :- final(V,min),!. 
+hConnect(V,-100) :- final(V,max),!.
 hConnect(V,G) :- playerVertices(V,e,VE),playerVertices(V,w,PW),separateIntoIslets(PW,IW),minDistSumIslets(IW,VE,DW),
                                          playerVertices(V,b,PB),separateIntoIslets(PB,IB),minDistSumIslets(IB,VE,DB),
 										    length(V, M),
@@ -39,19 +39,19 @@ distSumIslet(I,V,D) :- minLengthToEdge(I,1,V,L1),minLengthToEdge(I,2,V,L2),minLe
 minLengthToEdge(I,E,V,M) :- setof(X,lengthToEdge(I,E,V,X),L),list_min(L,M).
 
 %lengthToEdge(+Islet, +Edge, +VisitableVertices, -Length)
-lengthToEdge(I,E,V,L) :- member(X,I),verticeOnEdge(Y,E),minPathLength(X,Y,V,L).
+lengthToEdge(I,E,V,L) :- member(S,I),findall(X,verticeOnEdge(X,E),G),minPathLength(S,G,V,L).
 
-%minPathLength(+StartingVertice, +Goal, +PlayerVertices, -Length)
+%minPathLength(+StartingVertice, +Goals, +PlayerVertices, -Length)
 minPathLength(S,G,P,L) :- empty_assoc(D),put_assoc(S,D,0,D2),minPathLength1([S],G,[S],P,D2,L).
-% minPathLength(+FIFO, +Goal, +VisitedVertex, +PlayerVertices, +AssocDistances, -Length)
-minPathLength1([S|_],G,_,P,A,L1) :- arc(S,G),member(G,P),get_assoc(S,A,L),L1 is L + 1,!.
+% minPathLength(+FIFO, +Goals, +VisitedVertex, +PlayerVertices, +AssocDistances, -Length)
+minPathLength1([S|_],G,_,P,A,L1) :- member(X,G),arc(S,X),member(X,P),get_assoc(S,A,L),L1 is L + 1,!.
 minPathLength1([S|T],G,V,P,A,L) :- findall(X,(arc(S,X),not(member(X,V)),member(X,P)),E),
-				   append(T,E,F),
-				   append(V,E,V2),
-				   get_assoc(S,A,D1),
-				   D2 is D1 + 1,
-				   put_assoc_list(E,A,D2,A2),
-				   minPathLength1(F,G,V2,P,A2,L).
+                                   append(T,E,F),
+                                   append(V,E,V2),
+                                   get_assoc(S,A,D1),
+                                   D2 is D1 + 1,
+                                   put_assoc_list(E,A,D2,A2),
+                                   minPathLength1(F,G,V2,P,A2,L).
 
 %put_assoc_list(+KeyList, +Assoc, +Value, -NewAssoc).
 put_assoc_list([],A,_,A).
