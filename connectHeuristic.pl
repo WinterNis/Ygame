@@ -13,8 +13,8 @@
 %a2 = 100
 %b2 = 0
 
-hConnect(V,100) :- final(V,min),!. 
-hConnect(V,-100) :- final(V,max),!.
+hConnect(V,100) :- final(V,max),!. 
+hConnect(V,-100) :- final(V,min),!.
 hConnect(V,G) :- playerVertices(V,e,VE),playerVertices(V,w,PW),separateIntoIslets(PW,IW),minDistSumIslets(IW,VE,DW),
                                          playerVertices(V,b,PB),separateIntoIslets(PB,IB),minDistSumIslets(IB,VE,DB),
 										    length(V, M),
