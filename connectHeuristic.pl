@@ -5,21 +5,21 @@
 %In this heuristic, the best player is the one who has the islet which is the nearest to win.
 %A theoric maximum distance of an islet to the edges is (N(N-1)/4)+2.
 %The minimum distance of an islet to the edge is 3.
-%We map the grade of a player between 0 and 100. 0 corresponds to (N(N-1)/4)+2 and 100 corresponds to 3.
+%We map the grade of a player between 0 and 99. 0 corresponds to (N(N-1)/4)+2 and 99 corresponds to 0.
 %The heuristic is the grade of max minus the grade of min.
 
-%a1 = 3
+%a1 = 0
 %b1 = (length(V)/2)+2
-%a2 = 100
+%a2 = 99
 %b2 = 0
 
 hConnect(V,100) :- final(V,max),!. 
 hConnect(V,-100) :- final(V,min),!.
-hConnect(V,G) :- playerVertices(V,e,VE),playerVertices(V,w,PW),separateIntoIslets(PW,IW),minDistSumIslets(IW,VE,DW),
-                                         playerVertices(V,b,PB),separateIntoIslets(PB,IB),minDistSumIslets(IB,VE,DB),
+hConnect(V,G) :- playerVertices(V,e,VE),playerVertices(V,w,PW),separateIntoIslets(PW,IW),union(VE,PW,VW),minDistSumIslets(IW,VW,DW),
+                                         playerVertices(V,b,PB),separateIntoIslets(PB,IB),union(VE,PB,VB),minDistSumIslets(IB,VB,DB),
 										    length(V, M),
-											GW is (-100*DW + 3*((M/2)+2))/((M/2)-1),
-											GB is (-100*DB + 3*((M/2)+2))/((M/2)-1),
+											GW is (99*((M/2)+2-DW))/((M/2)+2),
+											GB is (99*((M/2)+2-DB))/((M/2)+2),
 											G is GW - GB.
 
 
@@ -44,7 +44,7 @@ lengthToEdge(I,E,V,L) :- member(S,I),findall(X,verticeOnEdge(X,E),G),minPathLeng
 %minPathLength(+StartingVertice, +Goals, +PlayerVertices, -Length)
 minPathLength(S,G,P,L) :- empty_assoc(D),put_assoc(S,D,0,D2),minPathLength1([S],G,[S],P,D2,L).
 % minPathLength(+FIFO, +Goals, +VisitedVertex, +PlayerVertices, +AssocDistances, -Length)
-minPathLength1([S|_],G,_,P,A,L1) :- member(X,G),arc(S,X),member(X,P),get_assoc(S,A,L),L1 is L + 1,!.
+minPathLength1([S|_],G,_,P,A,L) :- member(S,G),member(S,P),get_assoc(S,A,L),!.
 minPathLength1([S|T],G,V,P,A,L) :- findall(X,(arc(S,X),not(member(X,V)),member(X,P)),E),
                                    append(T,E,F),
                                    append(V,E,V2),
